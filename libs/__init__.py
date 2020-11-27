@@ -1,4 +1,4 @@
-from numpy import random, around, array
+from numpy import random, around, array, unique
 from pandas import DataFrame
 
 #Generate a random number
@@ -62,8 +62,19 @@ def gen_nums(nums, poss_nums, excl_nums=[]):
         out_nums.append(new_num)
     return out_nums, excl_nums
 
-def gen_tickets(num_tickets):
+def count_nums(nums):
+    """Count the number of items in a numpy array"""
+    #flatten
+    nums = array(nums).flatten()
+    #count
+    vals, counts = unique(nums, return_counts=True)
+    return dict(zip(vals, counts))
+
+def gen_tickets(num_tickets, seed=None):
     """Function for generating multiple tickets"""
+    #Set the random seed
+    if seed is not None:
+        random.seed(int(seed))
     #Create range of possible numbers
     main_poss_nums = array(range(50)) + 1
     star_poss_nums = array(range(12)) + 1
@@ -83,6 +94,18 @@ def gen_tickets(num_tickets):
         stars = [int(v) for v in stars]
         #Append to the tickets object
         tickets.append([main, stars])
+    #count all main numbers
+    main_counts = count_nums([v[0] for v in tickets])
+    #print them
+    print("key-count")
+    print("---------")
+    _ = [print(f"{k}-{v}") for k,v in main_counts.items()]
+    #count all main numbers
+    star_counts = count_nums([v[1] for v in tickets])
+    #print them
+    print("key-count")
+    print("---------")
+    _ = [print(f"{k}-{v}") for k,v in star_counts.items()]
     #convert to dataframe
     tickets = DataFrame(tickets, columns=["main","stars"])
     return tickets
